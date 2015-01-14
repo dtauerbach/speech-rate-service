@@ -1,8 +1,17 @@
-from flask import Flask, request, render_template, redirect, url_for
-from flaskext.uploads import UploadSet
+import random
+from flask import Flask, flash, request, render_template, redirect, url_for
+from flaskext.uploads import UploadSet, configure_uploads
 app = Flask(__name__)
+app.secret_key = 'this is a fake secret key boyyeeeeee'
 
-audios = UploadSet('audios')
+app.config['UPLOADED_AUDIOS_DEST'] = 'wavs/'
+audiofiles = UploadSet('audios', ('wav',))
+configure_uploads(app, (audiofiles,))
+
+class Audio(object):
+    def __init__(self, filename):
+        self.filename = filename
+        self.id = int(random.random() * 100000000)
 
 @app.route('/')
 def hello_world():
@@ -11,20 +20,20 @@ def hello_world():
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST' and 'audio' in request.files:
-        filename = audios.save(request.files['audio'])
-        rec = Audio(filename=filename, user=g.user.id)
-        rec.store()
+        filename = audiofiles.save(request.files['audio'])
+        rec = Audio(filename=filename)
+        # rec.store()
         flash("Audio saved.")
         return redirect(url_for('show', id=rec.id))
     return render_template('upload.html')
 
 @app.route('/audio/<id>')
 def show(id):
-    audio = Audio.load(id)
-    if audio is None:
-        abort(404)
-    url = audios.url(audio.filename)
-    return render_template('show.html', url=url, audio=audio)
+    # audio = Audio.load(id)
+    # if audio is None:
+    #     abort(404)
+    # url = audiofiles.url(audio.filename)
+    return render_template('show.html', id=id)
 
 if __name__ == '__main__':
     app.debug = True
