@@ -23,7 +23,7 @@ def upload():
         filename = audiofiles.save(request.files['audio'])
         rec = Audio(filename=filename)
         # rec.store()
-        flash("Audio saved.")
+        flash("Audio saved with filename %s" % filename)
         return redirect(url_for('show', id=rec.id))
     return render_template('upload.html')
 
@@ -34,6 +34,7 @@ def show(id):
     #     abort(404)
     # url = audiofiles.url(audio.filename)
     return render_template('show.html', id=id)
+
 
 if __name__ == '__main__':
     app.debug = True
