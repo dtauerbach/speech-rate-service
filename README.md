@@ -16,6 +16,10 @@ This may be helpful but not necessary:
 
     $ sudo pip install virtualenvwrapper
 
+You also need to install some esoteric academic software called Praat, which underlies a lot of the computational analysis of the audio:
+
+    # sudo apt-get install praat
+
 Next, start a virtualenv instance to install the project specific dependencies.
 
     $ virtualenv venv
