@@ -1,8 +1,18 @@
 <html>
+<center>
+{% if balance_score < 0.4 %}
+<h1 style="color:green"> Balanced :) </h1>
+{% else %}
+<h1 style="color:red"> Imbalanced :( </h1>
+{% endif %}
+</center>
+
 The balance score (TM) for this meeting is {{ balance_score }}. <br><br>
 
-(A balance score of 0 means the meeting is very one-sided, and a balance score of 100 implies a balanced and harmonious meeting). <br><br>
+(A balance score of 1 means the meeting is very one-sided, and a balance score of 0 implies a balanced and harmonious meeting). <br><br>
 
-{{ clip_stats }}
+{% for key, value in clip_stats.iteritems() %}
+    <dt>Participant {{ key }} : {{ value[0] }} seconds; {{ value[1] }} percentage of time</dt>
+{% endfor %}
 
 </html>
