@@ -1,17 +1,18 @@
-import os
+import os, os.path
 from time import time
 from pydub import AudioSegment
 
-
+BASE_DIRECTORY = '/tmp'
 
 class SegmentFinder:
-    def __init__(self, wav_file_name):
+    def __init__(self, wav_file_name, random_token):
         self.wav_file_name = wav_file_name
-        self.seg_file_name = str(int(time())) + 'seg.seg'
+        os.mkdir(os.path.join(BASE_DIRECTORY, random_token))
+        self.seg_file_name = os.path.join(BASE_DIRECTORY, random_token, 'seg.seg')
 
     def create_segfile(self):
-        os.system('/usr/bin/java -Xmx2024m -jar ./LIUM_SpkDiarization-4.2.jar --fInputMask=./' + \
-                              self.wav_file_name + ' --sOutputMask=./' + \
+        os.system('/usr/bin/java -Xmx2024m -jar ./app/lib/LIUM_SpkDiarization-4.2.jar --fInputMask=./' + \
+                              self.wav_file_name + ' --sOutputMask=' + \
                               self.seg_file_name + ' --doCEClustering  showName')
 
     def _parse_segfile_line(self, line):
@@ -26,9 +27,10 @@ class SegmentFinder:
         return [self._parse_segfile_line(line) for line in seg_file if line[0] != ";"]
 
 class Diarize:
-    def __init__(self, wav_file_name):
+    def __init__(self, wav_file_name, random_token):
         self.wav_file = AudioSegment.from_wav(wav_file_name)
-        seg_finder = SegmentFinder('ppl2.wav')
+        self.random_token = random_token
+        seg_finder = SegmentFinder(wav_file_name, random_token)
         seg_finder.create_segfile()
         self.event_data = seg_finder.get_event_data()
 
@@ -44,8 +46,5 @@ class Diarize:
 
         for name in clips:
             print "exporting clip " + name
-            clips[name].export(name + ".wav", format="wav")
-
-# example usage
-# s = Diarize('ppl2.wav')
-# s.split()
+            segment_file_name = os.path.join(BASE_DIRECTORY, self.random_token, name + '.wav')
+            clips[name].export(segment_file_name, format="wav")

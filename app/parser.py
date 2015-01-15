@@ -1,6 +1,8 @@
 import random
+from time import time
 from flask import Flask, flash, request, render_template, redirect, url_for
 from flaskext.uploads import UploadSet, configure_uploads
+import lib.diarize as diarize
 app = Flask(__name__)
 app.secret_key = 'this is a fake secret key boyyeeeeee'
 
@@ -20,10 +22,10 @@ def hello_world():
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST' and 'audio' in request.files:
+        timestamp = str(int(time()))
         filename = audiofiles.save(request.files['audio'])
-        rec = Audio(filename=filename)
-        # rec.store()
-        flash("Audio saved with filename %s" % filename)
+        d = diarize.Diarize('wavs/%s' % filename, timestamp)
+        d.split()
         return redirect(url_for('show', id=rec.id))
     return render_template('upload.html')
 
