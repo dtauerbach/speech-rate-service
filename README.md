@@ -20,6 +20,10 @@ You also need to install some esoteric academic software called Praat, which und
 
     # sudo apt-get install praat
 
+And some audio processing packages...
+
+    # sudo apt-get install libav-tools
+
 Next, start a virtualenv instance to install the project specific dependencies.
 
     $ virtualenv venv
