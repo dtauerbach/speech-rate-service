@@ -39,12 +39,14 @@ class Diarize:
         for event in self.event_data:
             start = event["start_time"]
             end = start + event["duration"]
+            duration = event["duration"]
             if event["speaker"] in clips.keys():
-                clips[event["speaker"]] = clips[event["speaker"]] + self.wav_file[start:end]
+                clips[event["speaker"]] = [clips[event["speaker"]][0] + self.wav_file[start:end], clips[event["speaker"]][1] + duration]
             else:
-                clips[event["speaker"]] = self.wav_file[start:end]
+                clips[event["speaker"]] = [self.wav_file[start:end], duration]
 
         for name in clips:
             print "exporting clip " + name
             segment_file_name = os.path.join(BASE_DIRECTORY, self.random_token, name + '.wav')
-            clips[name].export(segment_file_name, format="wav")
+            clips[name][0].export(segment_file_name, format="wav")
+        return clips

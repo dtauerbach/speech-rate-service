@@ -10,11 +10,6 @@ app.config['UPLOADED_AUDIOS_DEST'] = 'wavs/'
 audiofiles = UploadSet('audios', ('wav',))
 configure_uploads(app, (audiofiles,))
 
-class Audio(object):
-    def __init__(self, filename):
-        self.filename = filename
-        self.id = int(random.random() * 100000000)
-
 @app.route('/')
 def hello_world():
     return 'Hello World!'
@@ -25,17 +20,10 @@ def upload():
         timestamp = str(int(time()))
         filename = audiofiles.save(request.files['audio'])
         d = diarize.Diarize('wavs/%s' % filename, timestamp)
-        d.split()
-        return redirect(url_for('show', id=rec.id))
+        clips = d.split()
+        length_dict = {k: int(v[1]/1000.) for k,v in clips.items()}
+        return render_template('show.html', id=timestamp, clip_stats=length_dict)
     return render_template('upload.html')
-
-@app.route('/audio/<id>')
-def show(id):
-    # audio = Audio.load(id)
-    # if audio is None:
-    #     abort(404)
-    # url = audiofiles.url(audio.filename)
-    return render_template('show.html', id=id)
 
 
 if __name__ == '__main__':
